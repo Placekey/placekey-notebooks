@@ -1,0 +1,6 @@
+placekey
+jupyter
+folium
+shapely
+geopandas
+numpy
