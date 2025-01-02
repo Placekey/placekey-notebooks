@@ -17,13 +17,11 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
 ## Tutorials
 
 #### Python
-* Joining POI datasets with Placekey: [[tutorial](https://www.placekey.io/blog/joining-overture-and-npi-datasets)], [[colab notebook](https://www.placekey.io/blog/joining-overture-and-npi-datasets)]
+* Joining POI datasets with Placekey: [[tutorial](https://www.placekey.io/blog/joining-overture-and-npi-datasets)], [[colab notebook](https://colab.research.google.com/drive/17BimmoiW4bqpyBb0-MdK2z9MwcSVAb-8?usp=sharing)]
 * Joining POI and non-POI datasets with Placekey: [[tutorial](https://www.placekey.io/tutorials/joining-poi-and-non-poi-datasets-with-placekey)], [[colab notebook](https://colab.research.google.com/drive/1meH81cvoMx1IxvQ7GCVKSkW1bJM2d-DV)]
-* Using Placekey without Addresses (Latitude and Longitude Only): [[tutorial](https://www.placekey.io/tutorials/using-placekey-without-addresses-latitude-and-longitude-only)], [[colab notebook](https://colab.research.google.com/drive/1-oJESn2wUVZl3IrahXcaYpd2DhqjVyGE)]
 * How to Clean and Deduplicate Addresses ("De-Duping"): [[tutorial](https://www.placekey.io/tutorials/cleaning-duplicate-addresses-using-placekey)], [[colab notebook](https://colab.research.google.com/drive/178QyBsAH1quI57fxoG5yDT-IJ3RIhOoZ)]
 
 #### Google Sheets with [Placekey for Google Sheets](https://workspace.google.com/marketplace/app/placekey_geocoder_and_address_parser/395020363939)
-* Using Placekey without Addresses (Latitude and Longitude Only): [[tutorial](https://www.placekey.io/tutorials/using-placekey-without-addresses-latitude-and-longitude-only)]
 * Using Placekey to Deal with Multiple Points of Interest at a Single Address: [[tutorial](https://www.placekey.io/tutorials/accounts-for-multiple-points-of-interest-at-a-single-address)]
 
 #### ArcGIS with [AGS_placekey](https://github.com/riccardoklinger/AGS_placekey)
