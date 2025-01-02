@@ -5,17 +5,13 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
 
 ## Using the [placekey-py](https://github.com/Placekey/placekey-py) Python library
 #### Placekey API Utilities in `placekey-py`
-* Calling Single Placekey Endpoint
-    - [colab](https://colab.research.google.com/drive/1Uap9so3Es2PUo1mNaTswYqKmgD41Rebh?usp=sharing)
-    - [notebook in repo](notebooks/Placekey_py_Simple_Getting_Started_Single.ipynb)
-* Calling Bulk Placekey Endpoint
-    - [colab](https://colab.research.google.com/drive/1y_81Kb-j1XXTxLP4B_LJXBZp2YoFJDHr?usp=sharing)
-    - [notebook in repo](notebooks/Placekey_py_Simple_Getting_Started_Bulk.ipynb)
+* Calling Single Placekey Endpoint: [[notebook in repo](notebooks/Placekey_py_Simple_Getting_Started_Single.ipynb)], [[colab](https://colab.research.google.com/drive/1Uap9so3Es2PUo1mNaTswYqKmgD41Rebh?usp=sharing)]
+* Calling Bulk Placekey Endpoint: [[notebook in repo](notebooks/Placekey_py_Simple_Getting_Started_Bulk.ipynb)], [[colab](https://colab.research.google.com/drive/1y_81Kb-j1XXTxLP4B_LJXBZp2YoFJDHr?usp=sharing)]
 
 
 #### Spatial Tooling for Placekey in `placekey-py`
-* [Basic Spatial Functionality of Placekey](https://placekey.github.io/placekey-notebooks/basic_functionality.html)
-* [Advanced Spatial Functionality of Placekey](https://placekey.github.io/placekey-notebooks/advanced_functionality.html)
+* Basic Spatial Functionality of Placekey: [[notebook in repo](https://placekey.github.io/placekey-notebooks/basic_functionality.html)]
+* Advanced Spatial Functionality of Placekey: [[notebook in repo](https://placekey.github.io/placekey-notebooks/advanced_functionality.html)]
 
 
 ## Tutorials
