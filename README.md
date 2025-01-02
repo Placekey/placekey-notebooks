@@ -11,7 +11,7 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
 
 #### Spatial Tooling for Placekey in `placekey-py`
 * Basic Spatial Functionality of Placekey: [[notebook](notebooks/basic_functionality.ipynb)]
-* Advanced Spatial Functionality of Placekey: [[notebook](notebooks/advanced_functionality.html)]
+* Advanced Spatial Functionality of Placekey: [[notebook](notebooks/advanced_functionality.ipynb)]
 
 
 ## Tutorials
@@ -23,8 +23,8 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
 * How to Clean and Deduplicate Addresses ("De-Duping"): [[tutorial](https://www.placekey.io/tutorials/cleaning-duplicate-addresses-using-placekey)], [[colab notebook](https://colab.research.google.com/drive/178QyBsAH1quI57fxoG5yDT-IJ3RIhOoZ)]
 
 #### Google Sheets with [Placekey for Google Sheets](https://workspace.google.com/marketplace/app/placekey_geocoder_and_address_parser/395020363939)
-* [Using Placekey without Addresses (Latitude and Longitude Only)](https://www.placekey.io/tutorials/using-placekey-without-addresses-latitude-and-longitude-only)
-* [Using Placekey to Deal with Multiple Points of Interest at a Single Address](https://www.placekey.io/tutorials/accounts-for-multiple-points-of-interest-at-a-single-address)
+* Using Placekey without Addresses (Latitude and Longitude Only): [[tutorial](https://www.placekey.io/tutorials/using-placekey-without-addresses-latitude-and-longitude-only)]
+* Using Placekey to Deal with Multiple Points of Interest at a Single Address: [[tutorial](https://www.placekey.io/tutorials/accounts-for-multiple-points-of-interest-at-a-single-address)]
 
 #### ArcGIS with [AGS_placekey](https://github.com/riccardoklinger/AGS_placekey)
-* [Address Matching without a Geocoder](https://www.placekey.io/tutorials/address-matching-without-a-geocoder)
+* Address Matching without a Geocoder: [[tutorial](https://www.placekey.io/tutorials/address-matching-without-a-geocoder)]
