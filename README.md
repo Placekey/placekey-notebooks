@@ -1,24 +1,28 @@
 # placekey-notebooks
-This repository contains Jupyter notebooks demonstrating functionality of the [Placekey python library](https://github.com/Placekey/placekey-py) and [Placekey API](https://docs.placekey.io/). See the [Placekey site](https://placekey.io/) for more information on Placekey.  
+This repository includes tutorials, such as Jupyter notebooks, Google Sheets guides and more, showcasing the features of the [Placekey](https://placekey.io), the [Placekey API](https://docs.placekey.io/), [Placekey Python library](https://github.com/Placekey/placekey-py) and an expanse of no-code tools. 
 
-## Placekey python library
-
-You can see outputs from the notebooks here:
-* [Basic](https://placekey.github.io/placekey-notebooks/basic_functionality.html)
-* [Advanced](https://placekey.github.io/placekey-notebooks/advanced_functionality.html)
-
-## Placekey API
-* [Quick Start Guide For Batch Process Placekey Matching With Python](https://github.com/Placekey/placekey-notebooks/blob/main/notebooks/Adding_Placekey_to_your_POI_dataset_using_python_and_the_Placekey_API.ipynb)
+For more details about Placekey, visit the [Placekey website](https://placekey.io/).
 
 ## Tutorials
 
-* [Joining POI datasets with Placekey](https://www.placekey.io/tutorials/joining-poi-datasets-with-placekey)
-* [Joining POI and non-POI datasets with Placekey](https://www.placekey.io/tutorials/joining-poi-and-non-poi-datasets-with-placekey)
-* [Using Placekey without Addresses (Latitude and Longitude Only)](https://www.placekey.io/tutorials/using-placekey-without-addresses-latitude-and-longitude-only)
-* [Comparing the Proximity of Two POIs Easily](https://www.placekey.io/tutorials/comparing-the-proximity-of-two-pois-easily)
-* [Using Placekey to Deal with Multiple Points of Interest at a Single Address](https://www.placekey.io/tutorials/accounts-for-multiple-points-of-interest-at-a-single-address)
-* [Address Matching without a Geocoder](https://www.placekey.io/tutorials/address-matching-without-a-geocoder)
-* [How to Clean and Deduplicate Addresses ("De-Duping")](https://www.placekey.io/tutorials/cleaning-duplicate-addresses-using-placekey)
-* [Making Address Validation Easy with Placekey](https://www.placekey.io/tutorials/using-placekey-for-address-validation)
-* [Joining Address Data Involving Sub Units ("Line 2")](https://www.placekey.io/tutorials/using-placekey-to-effectively-join-data-about-sub-units)
+#### Python
+* Joining POI datasets with Placekey: [[tutorial](https://www.placekey.io/blog/joining-overture-and-npi-datasets)], [[colab notebook](https://colab.research.google.com/drive/17BimmoiW4bqpyBb0-MdK2z9MwcSVAb-8?usp=sharing)]
+* Joining POI and non-POI datasets with Placekey: [[tutorial](https://www.placekey.io/tutorials/joining-poi-and-non-poi-datasets-with-placekey)], [[colab notebook](https://colab.research.google.com/drive/1meH81cvoMx1IxvQ7GCVKSkW1bJM2d-DV)]
+* How to Clean and Deduplicate Addresses ("De-Duping"): [[tutorial](https://www.placekey.io/tutorials/cleaning-duplicate-addresses-using-placekey)], [[colab notebook](https://colab.research.google.com/drive/178QyBsAH1quI57fxoG5yDT-IJ3RIhOoZ)]
 
+#### Google Sheets with [Placekey for Google Sheets](https://workspace.google.com/marketplace/app/placekey_geocoder_and_address_parser/395020363939)
+* Using Placekey without Addresses (Latitude and Longitude Only): [[tutorial](https://www.placekey.io/tutorials/using-placekey-without-addresses-latitude-and-longitude-only)]
+* Using Placekey to Deal with Multiple Points of Interest at a Single Address: [[tutorial](https://www.placekey.io/tutorials/accounts-for-multiple-points-of-interest-at-a-single-address)]
+
+#### ArcGIS with [AGS_placekey](https://github.com/riccardoklinger/AGS_placekey)
+* Address Matching without a Geocoder: [[tutorial](https://www.placekey.io/tutorials/address-matching-without-a-geocoder)]
+
+##  Using the [placekey-py](https://github.com/Placekey/placekey-py) Python library
+#### Placekey API Utilities in `placekey-py`
+* Calling Single Placekey Endpoint: [[notebook](notebooks/Placekey_py_Simple_Getting_Started_Single.ipynb)], [[colab notebook](https://colab.research.google.com/drive/1Uap9so3Es2PUo1mNaTswYqKmgD41Rebh?usp=sharing)]
+* Calling Bulk Placekey Endpoint: [[notebook](notebooks/Placekey_py_Simple_Getting_Started_Bulk.ipynb)], [[colab notebook](https://colab.research.google.com/drive/1y_81Kb-j1XXTxLP4B_LJXBZp2YoFJDHr?usp=sharing)]
+
+
+#### Spatial Tooling for Placekey in `placekey-py`
+* Basic Spatial Functionality of Placekey: [[notebook](notebooks/basic_functionality.ipynb)]
+* Advanced Spatial Functionality of Placekey: [[notebook](notebooks/advanced_functionality.ipynb)]
