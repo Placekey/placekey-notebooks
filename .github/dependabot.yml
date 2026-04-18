@@ -1,0 +1,59 @@
+version: 2
+updates:
+  # Python deps. Dependabot reads requirements.txt (hash-pinned) directly and
+  # raises PRs that bump the exact version + hashes. For range-based updates
+  # edit requirements.in, then regenerate requirements.txt via pip-compile.
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "13:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+    groups:
+      jupyter:
+        patterns:
+          - "jupyter*"
+          - "ipykernel"
+          - "ipywidgets"
+          - "nbconvert"
+          - "nbformat"
+      geospatial:
+        patterns:
+          - "shapely"
+          - "geopandas"
+          - "folium"
+          - "h3"
+          - "pyproj"
+          - "fiona"
+      aws:
+        patterns:
+          - "awscli"
+          - "boto*"
+          - "botocore"
+          - "s3transfer"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  # GitHub Actions workflow versions. Actions are pinned by commit SHA with
+  # version tag as a trailing comment; Dependabot updates both together.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "13:15"
+      timezone: "Etc/UTC"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    allow:
+      - dependency-type: "direct"
