@@ -59,40 +59,35 @@ jobs:
         uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 # v2.1.2
 
   lockfile:
-    # Ensures requirements.txt is the deterministic pip-compile output of
-    # requirements.in. Catches: edits to .in without regenerating .txt, or
-    # hand-edits to .txt that pip-compile would not reproduce.
+    # Ensures requirements.txt is the deterministic `uv pip compile` output of
+    # requirements.in. Using uv's --universal mode so the file is
+    # cross-platform (platform-specific deps like appnope get marker-gated
+    # rather than platform-pinned), avoiding false drift between macOS devs
+    # and Linux CI.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
-        with:
-          python-version: "3.11"  # matches the Python used to generate requirements.txt
-
-      - name: Install pip-tools (pinned)
-        run: pip install "pip-tools==7.5.3"
+      - name: Install uv (pinned)
+        run: |
+          curl -LsSf https://astral.sh/uv/0.10.7/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Regenerate lockfile in a scratch tree and diff
         run: |
           set -euo pipefail
           scratch="$(mktemp -d)"
-          # Copy BOTH files so pip-compile uses the committed lockfile as an
-          # existing-pin source. Without this it fetches latest from PyPI on
-          # every CI run and fails spuriously whenever any transitive dep
-          # publishes a new release.
-          cp requirements.in requirements.txt "$scratch/"
-          (cd "$scratch" && pip-compile \
-              --quiet \
+          cp requirements.in "$scratch/"
+          (cd "$scratch" && uv pip compile \
+              --universal \
+              --python-version 3.11 \
               --generate-hashes \
-              --resolver=backtracking \
-              --allow-unsafe \
               --output-file=requirements.txt \
               requirements.in)
           if ! diff -u requirements.txt "$scratch/requirements.txt"; then
             echo "::error::requirements.txt is out of sync with requirements.in."
             echo "Regenerate with:"
-            echo "  pip-compile --generate-hashes --resolver=backtracking --allow-unsafe \\"
+            echo "  uv pip compile --universal --python-version 3.11 --generate-hashes \\"
             echo "    --output-file=requirements.txt requirements.in"
             exit 1
           fi

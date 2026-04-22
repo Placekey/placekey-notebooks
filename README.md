@@ -11,11 +11,10 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
    pip install -r requirements.txt
    ```
 
-   To bump versions, edit `requirements.in` then regenerate:
+   To bump versions, edit `requirements.in` then regenerate with [uv](https://github.com/astral-sh/uv) (universal mode, so the lockfile works across macOS + Linux without platform-specific drift):
 
    ```bash
-   pip install "pip-tools>=7.4,<8"
-   pip-compile --generate-hashes --resolver=backtracking --allow-unsafe \
+   uv pip compile --universal --python-version 3.11 --generate-hashes \
        --output-file=requirements.txt requirements.in
    ```
 
