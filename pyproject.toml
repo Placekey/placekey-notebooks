@@ -1,0 +1,44 @@
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["docs", "data", "build", "dist"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "W",    # pycodestyle warnings
+    "I",    # isort
+    "B",    # bugbear
+    "UP",   # pyupgrade
+]
+ignore = [
+    "E501", # line too long — notebooks often have wide cells
+    "E402", # module-level import not at top (cells commonly import mid-notebook)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["F401"]
+# Tutorial notebooks are demonstrative code, not production.
+# Accept legacy style so CI catches real bugs, not cosmetic drift.
+"notebooks/**/*.ipynb" = [
+    "I001",   # unsorted imports
+    "UP030",  # positional-format indices
+    "UP032",  # legacy .format() over f-strings
+    "W291",   # trailing whitespace
+    "W293",   # blank-line whitespace
+    "B006",   # mutable default arg
+    "B905",   # zip without strict=
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+
+[tool.codespell]
+skip = "*.ipynb_checkpoints,data,docs,*.svg,LICENSE,./.git,*.html"
+# Skip base64-encoded data URLs (embedded images in tutorial notebooks) — they
+# contain random byte sequences that trigger false positives.
+ignore-regex = "data:image/[a-z]+;base64,[A-Za-z0-9+/=]+"
+# Genuine false positives in prose/code.
+ignore-words-list = "nd,te,ba,ND,hist,sxl"

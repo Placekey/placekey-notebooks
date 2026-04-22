@@ -1,7 +1,38 @@
 # placekey-notebooks
-This repository includes tutorials, such as Jupyter notebooks, Google Sheets guides and more, showcasing the features of the [Placekey](https://placekey.io), the [Placekey API](https://docs.placekey.io/), [Placekey Python library](https://github.com/Placekey/placekey-py) and an expanse of no-code tools. 
+This repository includes tutorials, such as Jupyter notebooks, Google Sheets guides and more, showcasing the features of the [Placekey](https://placekey.io), the [Placekey API](https://docs.placekey.io/), [Placekey Python library](https://github.com/Placekey/placekey-py) and an expanse of no-code tools.
 
 For more details about Placekey, visit the [Placekey website](https://placekey.io/).
+
+## Setup
+
+1. Clone this repo and install dependencies. `requirements.txt` is **hash-pinned** (all transitive deps locked with sha256 hashes) and generated from `requirements.in`. Pip verifies hashes automatically:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+   To bump versions, edit `requirements.in` then regenerate with [uv](https://github.com/astral-sh/uv) (universal mode, so the lockfile works across macOS + Linux without platform-specific drift):
+
+   ```bash
+   uv pip compile --universal --python-version 3.11 --generate-hashes \
+       --output-file=requirements.txt requirements.in
+   ```
+
+   Dependabot also raises weekly PRs to update pinned versions + hashes (see `.github/dependabot.yml`).
+
+2. Get a Placekey API key — sign up at [placekey.io](https://placekey.io/).
+
+3. Provide the key to the notebooks **without pasting it into a cell**. Pick one:
+
+   - **Environment variable** (recommended):
+     ```bash
+     export PLACEKEY_API_KEY="your-key-here"
+     jupyter lab
+     ```
+   - **`.env` file** (auto-loaded by `python-dotenv`): copy `.env.example` to `.env` and fill it in. `.env` is gitignored.
+   - **Interactive prompt**: if neither of the above is set, the API notebooks fall back to `getpass.getpass()` and will prompt you at run time.
+
+   Never commit API keys. `.gitignore` excludes `.env`, `*.key`, and `*_api_key*`, and CI runs a secret scan on every push.
 
 ## Tutorials
 
@@ -26,3 +57,14 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
 #### Spatial Tooling for Placekey in `placekey-py`
 * Basic Spatial Functionality of Placekey: [[notebook](notebooks/basic_functionality.ipynb)]
 * Advanced Spatial Functionality of Placekey: [[notebook](notebooks/advanced_functionality.ipynb)]
+
+## Security
+
+- API keys are read from `PLACEKEY_API_KEY` or prompted interactively — never hardcode them in cells.
+- Dependencies in `requirements.txt` are hash-pinned (sha256) and verified by pip on install. Range specs live in `requirements.in`; Dependabot opens weekly bump PRs.
+- CI runs on every push and pull request:
+  - `gitleaks` — secret scanning
+  - Notebook hygiene check — blocks committed personal paths (`/Users/`, `/home/`) and API-key literals in cell sources
+  - `nbmake` — executes the key-free notebooks (`basic_functionality`, `advanced_functionality`)
+
+If you find a security issue, please open a private report via [GitHub Security Advisories](https://github.com/Placekey/placekey-notebooks/security/advisories/new).

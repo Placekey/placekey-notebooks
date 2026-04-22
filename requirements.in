@@ -1,0 +1,27 @@
+# Top-level version ranges.
+# `requirements.txt` is generated from this file with:
+#
+#     pip-compile --generate-hashes --resolver=backtracking \
+#         --output-file=requirements.txt requirements.in
+#
+# Dependabot monitors this file (see .github/dependabot.yml) and will open
+# PRs to bump versions; re-run the command above to refresh the lockfile.
+
+placekey>=0.0.9,<1.0
+pandas>=2.2,<3.0
+numpy>=1.26,<3.0
+shapely>=2.0,<3.0
+geopandas>=0.14,<2.0
+folium>=0.15,<1.0
+h3>=4.2,<5.0  # placekey>=0.0.36 requires h3 v4
+
+# Notebook runtime
+jupyter>=1.0,<2.0
+jupyterlab>=4.0,<5.0
+ipykernel>=6.29,<7.0
+
+# Data fetching for sample notebooks
+awscli>=1.32,<3.0
+
+# Secure local-key handling
+python-dotenv>=1.0,<2.0
