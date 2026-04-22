@@ -18,7 +18,7 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
        --output-file=requirements.txt requirements.in
    ```
 
-   Dependabot also raises weekly PRs to update pinned versions + hashes (see `.github/dependabot.yml`).
+   Dependabot raises weekly PRs to update pinned versions + hashes (see `.github/dependabot.yml`). Major-version bumps are capped in both `requirements.in` and `dependabot.yml`'s `ignore:` block; to take one, raise the cap in both files and regenerate. A companion workflow (`dependabot-lockfile.yml`) auto-regenerates `requirements.txt` with `uv` after each Dependabot pip PR so hashes stay coherent across transitives.
 
 2. Get a Placekey API key — sign up at [placekey.io](https://placekey.io/).
 
