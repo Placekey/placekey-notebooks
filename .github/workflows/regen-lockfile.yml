@@ -1,0 +1,62 @@
+name: regen-lockfile
+
+# Manual-only workflow to regenerate `requirements.txt` from `requirements.in`
+# inside a Linux runner — matches the platform used by every other job and by
+# Dependabot, so the `lockfile` drift check in tests.yml stays green.
+#
+# Trigger from the CLI with:
+#     gh workflow run regen-lockfile.yml --ref <branch>
+#
+# The workflow commits the regenerated file back to the triggering branch.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          # Full history so the commit we create can be pushed back.
+          fetch-depth: 0
+          # The default ephemeral GITHUB_TOKEN is fine for pushing to the same
+          # branch the workflow ran on.
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.11"
+
+      - name: Install pip-tools (pinned)
+        run: pip install "pip-tools==7.5.3"
+
+      - name: Regenerate requirements.txt
+        run: |
+          pip-compile \
+            --quiet \
+            --generate-hashes \
+            --resolver=backtracking \
+            --allow-unsafe \
+            --output-file=requirements.txt \
+            requirements.in
+
+      - name: Commit & push if changed
+        run: |
+          set -euo pipefail
+          if git diff --quiet requirements.txt; then
+            echo "lockfile already up to date"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add requirements.txt
+          git commit -m "ci: regenerate requirements.txt via pip-compile"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
