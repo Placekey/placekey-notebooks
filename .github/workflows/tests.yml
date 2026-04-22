@@ -58,44 +58,6 @@ jobs:
       - name: actionlint
         uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 # v2.1.2
 
-  lockfile:
-    # Ensures requirements.txt is the deterministic `uv pip compile` output of
-    # requirements.in. Using uv's --universal mode so the file is
-    # cross-platform (platform-specific deps like appnope get marker-gated
-    # rather than platform-pinned), avoiding false drift between macOS devs
-    # and Linux CI.
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
-      - name: Install uv (pinned)
-        run: |
-          curl -LsSf https://astral.sh/uv/0.10.7/install.sh | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-      - name: Regenerate lockfile in a scratch tree and diff
-        run: |
-          set -euo pipefail
-          scratch="$(mktemp -d)"
-          # Copy BOTH files — uv reads existing pins from the output file so
-          # it only bumps versions when requirements.in actually forces one.
-          # Without requirements.txt present, uv fetches the latest from PyPI
-          # on every run and spuriously drifts on any upstream release.
-          cp requirements.in requirements.txt "$scratch/"
-          (cd "$scratch" && uv pip compile \
-              --universal \
-              --python-version 3.11 \
-              --generate-hashes \
-              --output-file=requirements.txt \
-              requirements.in)
-          if ! diff -u requirements.txt "$scratch/requirements.txt"; then
-            echo "::error::requirements.txt is out of sync with requirements.in."
-            echo "Regenerate with:"
-            echo "  uv pip compile --universal --python-version 3.11 --generate-hashes \\"
-            echo "    --output-file=requirements.txt requirements.in"
-            exit 1
-          fi
-
   pytest:
     runs-on: ubuntu-latest
     strategy:

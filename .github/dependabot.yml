@@ -1,8 +1,14 @@
 version: 2
 updates:
-  # Python deps. Dependabot reads requirements.txt (hash-pinned) directly and
-  # raises PRs that bump the exact version + hashes. For range-based updates
-  # edit requirements.in, then regenerate requirements.txt via pip-compile.
+  # Python deps. Dependabot edits requirements.in (where ranges live) AND
+  # regenerates requirements.txt. The `ignore:` block caps major bumps at the
+  # same bounds that requirements.in declares, so Dependabot won't even open
+  # PRs for capped majors; a human must raise the cap intentionally to take
+  # one (edit requirements.in + this file + regenerate with uv).
+  #
+  # A companion workflow (.github/workflows/dependabot-lockfile.yml)
+  # regenerates requirements.txt with uv --universal after each Dependabot
+  # pip PR so hashes stay coherent across transitives.
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
@@ -39,6 +45,32 @@ updates:
     commit-message:
       prefix: "deps"
       include: "scope"
+    # Major-version caps. Mirror requirements.in's upper bounds; when bumping
+    # a cap, update both files. folium is intentionally uncapped (it has been
+    # 0.x for a decade and its eventual 1.0 is expected to be non-breaking).
+    ignore:
+      - dependency-name: "placekey"
+        versions: [">=1.0"]
+      - dependency-name: "pandas"
+        versions: [">=3.0"]
+      - dependency-name: "numpy"
+        versions: [">=3.0"]
+      - dependency-name: "shapely"
+        versions: [">=3.0"]
+      - dependency-name: "geopandas"
+        versions: [">=2.0"]
+      - dependency-name: "h3"
+        versions: [">=5.0"]
+      - dependency-name: "jupyter"
+        versions: [">=2.0"]
+      - dependency-name: "jupyterlab"
+        versions: [">=5.0"]
+      - dependency-name: "ipykernel"
+        versions: [">=7.0"]
+      - dependency-name: "awscli"
+        versions: [">=3.0"]
+      - dependency-name: "python-dotenv"
+        versions: [">=2.0"]
 
   # GitHub Actions workflow versions. Actions are pinned by commit SHA with
   # version tag as a trailing comment; Dependabot updates both together.

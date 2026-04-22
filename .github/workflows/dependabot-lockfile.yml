@@ -1,0 +1,97 @@
+name: dependabot-lockfile
+
+# Dependabot's pip ecosystem edits requirements.txt and requirements.in but
+# does not know how to run `uv pip compile --universal --generate-hashes`, so
+# its output often has incoherent hashes across transitives (direct dep bumps
+# whose transitive closure changes produce un-`==`-pinned lines that
+# `pip install --require-hashes` rejects).
+#
+# This workflow runs after Dependabot opens/updates a pip PR, regenerates
+# requirements.txt with uv, and commits the clean lockfile back onto the
+# PR branch. We use `pull_request_target` so the workflow runs with the base
+# branch's permissions and GITHUB_TOKEN (Dependabot's own token is read-only).
+# The commit from GITHUB_TOKEN does not re-trigger CI; the last step calls
+# `gh workflow run` to re-dispatch validation against the updated branch.
+
+on:
+  pull_request_target:
+    paths:
+      - requirements.in
+      - requirements.txt
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  regen:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Install uv (pinned)
+        run: |
+          curl -LsSf https://astral.sh/uv/0.10.7/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Regenerate requirements.txt
+        run: |
+          uv pip compile \
+            --universal \
+            --python-version 3.11 \
+            --generate-hashes \
+            --output-file=requirements.txt \
+            requirements.in
+
+      - name: Commit & push if changed
+        id: commit
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet requirements.txt; then
+            echo "lockfile already coherent — no regen needed"
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add requirements.txt
+          git commit -m "ci: regenerate requirements.txt via uv (dependabot)"
+          git push origin "HEAD:${HEAD_REF}"
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Re-dispatch validation workflows against the updated branch
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          for wf in tests.yml notebook-ci.yml notebook-hygiene.yml deps-audit.yml; do
+            echo "dispatching $wf against $BRANCH"
+            gh workflow run "$wf" --ref "$BRANCH" --repo "$REPO" || true
+          done
+
+      - name: Comment on PR
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr comment "$PR_NUMBER" \
+            --repo "$REPO" \
+            --body "Regenerated \`requirements.txt\` with \`uv pip compile --universal --python-version 3.11 --generate-hashes\` to keep the hash set coherent across transitive deps. Re-dispatching CI against the updated branch."
