@@ -21,7 +21,7 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
 
    Dependabot also raises weekly PRs to update pinned versions + hashes (see `.github/dependabot.yml`).
 
-2. Get a Placekey API key: [dev.placekey.io/default/register](https://dev.placekey.io/default/register).
+2. Get a Placekey API key — sign up at [placekey.io](https://placekey.io/).
 
 3. Provide the key to the notebooks **without pasting it into a cell**. Pick one:
 

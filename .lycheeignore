@@ -1,0 +1,13 @@
+# Demo / localhost URLs that appear in tutorial cells.
+^https?://localhost(:\d+)?/?
+
+# Notebook-extraction artifacts: lychee treats embedded "\n" escapes as part
+# of the URL, producing strings like "docs.placekey.io//n".
+//n$
+
+# Known-broken upstream links in pre-existing tutorial content. Leaving these
+# to be fixed in a follow-up content-focused PR rather than widening the scope
+# of the security/CI hardening change.
+^https://dev\.placekey\.io/default/register$
+^https://docs\.placekey\.io/Placekey_Technical_White_Paper\.pdf$
+^https://shapely\.readthedocs\.io/en/latest/project\.html$

@@ -77,9 +77,11 @@ jobs:
         run: |
           set -euo pipefail
           scratch="$(mktemp -d)"
-          cp requirements.in "$scratch/"
-          # Generate using the same filename as the committed file so the
-          # pip-compile header (which records --output-file) matches byte-for-byte.
+          # Copy BOTH files so pip-compile uses the committed lockfile as an
+          # existing-pin source. Without this it fetches latest from PyPI on
+          # every CI run and fails spuriously whenever any transitive dep
+          # publishes a new release.
+          cp requirements.in requirements.txt "$scratch/"
           (cd "$scratch" && pip-compile \
               --quiet \
               --generate-hashes \
