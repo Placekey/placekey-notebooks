@@ -77,7 +77,11 @@ jobs:
         run: |
           set -euo pipefail
           scratch="$(mktemp -d)"
-          cp requirements.in "$scratch/"
+          # Copy BOTH files — uv reads existing pins from the output file so
+          # it only bumps versions when requirements.in actually forces one.
+          # Without requirements.txt present, uv fetches the latest from PyPI
+          # on every run and spuriously drifts on any upstream release.
+          cp requirements.in requirements.txt "$scratch/"
           (cd "$scratch" && uv pip compile \
               --universal \
               --python-version 3.11 \
