@@ -21,7 +21,7 @@ jupyterlab>=4.0,<5.0
 ipykernel>=6.29,<7.0
 
 # Data fetching for sample notebooks
-awscli>=1.44.84,<3.0
+awscli>=1.44.86,<3.0
 
 # Secure local-key handling
 python-dotenv>=1.0,<2.0
