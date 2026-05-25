@@ -9,7 +9,7 @@
 
 placekey>=0.0.9,<1.0
 pandas>=2.2,<3.0
-numpy>=1.26,<3.0
+numpy>=2.4.5,<3.0
 shapely>=2.0,<3.0
 geopandas>=0.14,<2.0
 folium>=0.15,<1.0
