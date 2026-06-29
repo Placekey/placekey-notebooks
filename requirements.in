@@ -11,9 +11,9 @@ placekey>=0.0.9,<1.0
 pandas>=2.2,<3.0
 numpy>=1.26,<3.0
 shapely>=2.0,<3.0
-geopandas>=0.14,<2.0
+geopandas>=1.1.4,<2.0
 folium>=0.15,<1.0
-h3>=4.2,<5.0  # placekey>=0.0.36 requires h3 v4
+h3>=4.5.0,<5.0  # placekey>=0.0.36 requires h3 v4
 
 # Notebook runtime
 jupyter>=1.0,<2.0
