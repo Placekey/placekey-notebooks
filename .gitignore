@@ -35,7 +35,10 @@ ipython_config.py
 .DS_Store
 Thumbs.db
 .idea/
-.vscode/
+# .vscode/ is ignored except cspell.json, which .github/workflows/spellcheck.yaml
+# requires at exactly this path (the reusable hardcodes it and takes no inputs).
+.vscode/*
+!.vscode/cspell.json
 *.swp
 *.swo
 

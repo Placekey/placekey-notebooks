@@ -1,3 +1,58 @@
+# Dependency manifest and tool configuration.
+#
+# `[project] dependencies` below is the complete declaration of what this
+# repository needs, and `pip install .` is the whole install — here, on a
+# developer's machine, and in CI. There is deliberately NO lockfile.
+#
+# That is a decision, not an omission: a lockfile is one resolve for one
+# interpreter on one operating system, and these are tutorial notebooks meant
+# to keep working against current releases rather than a deployed artifact
+# needing a reproducible build. The upper bounds below are the control — they
+# stop a major version landing without someone deciding to take it.
+
+[project]
+# This repository ships notebooks, not a distribution — nothing here is built,
+# published to an index or imported as a package. `name` and `version` exist
+# only because `[project]` requires them; they are not a release identity, they
+# are never bumped, and nothing consumes them.
+name = "placekey-notebooks"
+version = "0"
+description = "Dependency manifest for the Placekey tutorial notebooks (not a published package)."
+# CI runs 3.11 and 3.12, and [tool.ruff] targets py311.
+requires-python = ">=3.11"
+dependencies = [
+  "placekey>=0.0.9,<1.0",
+  "pandas>=2.2,<3.0",
+  "numpy>=1.26,<3.0",
+  "shapely>=2.0,<3.0",
+  "geopandas>=0.14,<2.0",
+  "folium>=0.15,<1.0",
+  "h3>=4.2,<5.0", # placekey>=0.0.36 requires h3 v4
+
+  # Notebook runtime
+  "jupyter>=1.0,<2.0",
+  "jupyterlab>=4.0,<5.0",
+  "ipykernel>=6.29,<7.0",
+
+  # Data fetching for sample notebooks
+  "awscli>=1.44.84,<3.0",
+
+  # Secure local-key handling
+  "python-dotenv>=1.0,<2.0",
+]
+
+[build-system]
+requires = ["setuptools>=84.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# Nothing is packaged from this repository. Stating an empty module list turns
+# setuptools' flat-layout auto-discovery off, which would otherwise refuse to
+# build at all ("multiple top-level packages discovered": data, docs, notebooks,
+# tests). This is what makes `pip install .` — the one install path — resolve
+# the dependencies above and install no code.
+[tool.setuptools]
+py-modules = []
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"

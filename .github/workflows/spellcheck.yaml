@@ -1,0 +1,17 @@
+name: Spellcheck
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  spellcheck:
+    permissions:
+      contents: read
+    uses: senzing-factory/build-resources/.github/workflows/cspell.yaml@v4

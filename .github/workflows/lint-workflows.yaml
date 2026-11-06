@@ -1,0 +1,20 @@
+name: Lint workflows
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  lint-workflows:
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write
+      statuses: write
+    uses: senzing-factory/build-resources/.github/workflows/lint-workflows.yaml@v4

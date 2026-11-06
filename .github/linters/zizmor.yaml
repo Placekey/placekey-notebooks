@@ -1,0 +1,19 @@
+rules:
+  secrets-outside-env:
+    # Scoped ignores, never `disable: true`: naming the file keeps the rule
+    # live everywhere else and puts each exception in the diff of whoever next
+    # touches it. The rule wants a GitHub *environment* on any job reading a
+    # secret, and exempts `secrets.GITHUB_TOKEN` itself -- so notebook-ci.yml
+    # (PLACEKEY_API_KEY) is the only file here it can fire on. Reusable-workflow
+    # callers are not audited at all.
+    ignore:
+      - notebook-ci.yml
+  unpinned-uses:
+    config:
+      policies:
+        # Third-party actions MUST be pinned to a full commit SHA (immutable).
+        # A tag can be moved by whoever owns the action; a SHA cannot.
+        "*": hash-pin
+        # First-party reusables are consumed at the moving major tag by design,
+        # so a fix reaches every consumer without a pull request to each.
+        "senzing-factory/*": ref-pin

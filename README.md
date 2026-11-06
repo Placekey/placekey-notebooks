@@ -5,20 +5,15 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
 
 ## Setup
 
-1. Clone this repo and install dependencies. `requirements.txt` is **hash-pinned** (all transitive deps locked with sha256 hashes) and generated from `requirements.in`. Pip verifies hashes automatically:
+1. Clone this repo and install dependencies. `pyproject.toml` declares everything, as version ranges:
 
    ```bash
-   pip install -r requirements.txt
+   pip install .
    ```
 
-   To bump versions, edit `requirements.in` then regenerate with [uv](https://github.com/astral-sh/uv) (universal mode, so the lockfile works across macOS + Linux without platform-specific drift):
+   That is the whole install, on every platform and in CI. There is no lockfile — a lockfile pins one resolve for one interpreter on one operating system, and these are tutorial notebooks meant to keep working against current releases rather than a deployed artifact that needs a reproducible build. Python 3.11 or newer is required; CI runs 3.11 and 3.12.
 
-   ```bash
-   uv pip compile --universal --python-version 3.11 --generate-hashes \
-       --output-file=requirements.txt requirements.in
-   ```
-
-   Dependabot raises weekly PRs to update pinned versions + hashes (see `.github/dependabot.yml`). Major-version bumps are capped in both `requirements.in` and `dependabot.yml`'s `ignore:` block; to take one, raise the cap in both files and regenerate. A companion workflow (`dependabot-lockfile.yml`) auto-regenerates `requirements.txt` with `uv` after each Dependabot pip PR so hashes stay coherent across transitives.
+   To change a version bound, edit `[project] dependencies` in `pyproject.toml`. Each dependency is capped below its next major, so a breaking release cannot arrive without someone deciding to take it. Dependabot opens PRs to move the bounds (see `.github/dependabot.yml`); taking a capped major means raising the bound in `pyproject.toml` **and** in that file's `ignore:` block.
 
 2. Get a Placekey API key — sign up at [placekey.io](https://placekey.io/).
 
@@ -61,7 +56,7 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
 ## Security
 
 - API keys are read from `PLACEKEY_API_KEY` or prompted interactively — never hardcode them in cells.
-- Dependencies in `requirements.txt` are hash-pinned (sha256) and verified by pip on install. Range specs live in `requirements.in`; Dependabot opens weekly bump PRs.
+- Dependency ranges live in `pyproject.toml`, capped below the next major. Dependabot opens bump PRs daily, and `deps-audit.yml` runs `pip-audit` over the resolved dependency tree on every change to the manifest and weekly on a schedule.
 - CI runs on every push and pull request:
   - `gitleaks` — secret scanning
   - Notebook hygiene check — blocks committed personal paths (`/Users/`, `/home/`) and API-key literals in cell sources

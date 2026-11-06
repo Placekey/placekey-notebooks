@@ -1,19 +1,24 @@
 version: 2
 updates:
-  # Python deps. Dependabot edits requirements.in (where ranges live) AND
-  # regenerates requirements.txt. The `ignore:` block caps major bumps at the
-  # same bounds that requirements.in declares, so Dependabot won't even open
-  # PRs for capped majors; a human must raise the cap intentionally to take
-  # one (edit requirements.in + this file + regenerate with uv).
+  # Python deps. `directory: "/"` is where pyproject.toml lives; its
+  # `[project] dependencies` ranges are the only manifest. There is no
+  # lockfile, and Dependabot's `pip` ecosystem reads a PEP 621 pyproject.toml
+  # directly.
   #
-  # A companion workflow (.github/workflows/dependabot-lockfile.yml)
-  # regenerates requirements.txt with uv --universal after each Dependabot
-  # pip PR so hashes stay coherent across transitives.
+  # The `ignore:` block caps major bumps at the same bounds that
+  # pyproject.toml's `[project] dependencies` declare, so Dependabot won't even
+  # open PRs for capped majors; a human must raise the cap intentionally to
+  # take one (edit pyproject.toml + this file, then regenerate the lockfile).
   - package-ecosystem: "pip"
+    assignees:
+      - "kernelsam"
+    cooldown:
+      default-days: 21
     directory: "/"
+    # Daily is a deliberate security standard: a vulnerable transitive should
+    # surface the day it is published, not up to a week later.
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
       time: "13:00"
       timezone: "Etc/UTC"
     open-pull-requests-limit: 10
@@ -43,11 +48,11 @@ updates:
           - "botocore"
           - "s3transfer"
     commit-message:
-      prefix: "deps"
-      include: "scope"
-    # Major-version caps. Mirror requirements.in's upper bounds; when bumping
-    # a cap, update both files. folium is intentionally uncapped (it has been
-    # 0.x for a decade and its eventual 1.0 is expected to be non-breaking).
+      prefix: "deps(python):"
+    # Major-version caps. Mirror the upper bounds in pyproject.toml's
+    # `[project] dependencies`; when bumping a cap, update both files. folium
+    # is intentionally uncapped (it has been 0.x for a decade and its eventual
+    # 1.0 is expected to be non-breaking).
     ignore:
       - dependency-name: "placekey"
         versions: [">=1.0"]
@@ -74,7 +79,15 @@ updates:
 
   # GitHub Actions workflow versions. Actions are pinned by commit SHA with
   # version tag as a trailing comment; Dependabot updates both together.
+  # senzing-factory/* is excluded from the cooldown: those are first-party and
+  # a fix there is meant to reach consumers without waiting three weeks.
   - package-ecosystem: "github-actions"
+    assignees:
+      - "kernelsam"
+    cooldown:
+      default-days: 21
+      exclude:
+        - "senzing-factory/*"
     directory: "/"
     schedule:
       interval: "weekly"
@@ -84,8 +97,11 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+    groups:
+      senzing-factory:
+        patterns:
+          - "senzing-factory/*"
     commit-message:
-      prefix: "ci"
-      include: "scope"
+      prefix: "deps(actions):"
     allow:
       - dependency-type: "direct"

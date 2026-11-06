@@ -4,16 +4,14 @@ on:
   push:
     branches: [main]
     paths:
-      - requirements.txt
-      - requirements.in
+      - pyproject.toml
       - .github/workflows/deps-audit.yml
   pull_request:
     paths:
-      - requirements.txt
-      - requirements.in
+      - pyproject.toml
       - .github/workflows/deps-audit.yml
   schedule:
-    - cron: "0 13 * * 1"  # weekly Monday 13:00 UTC
+    - cron: "0 13 * * 1" # weekly Monday 13:00 UTC
   workflow_dispatch:
 
 permissions:
@@ -31,6 +29,8 @@ jobs:
     continue-on-error: ${{ github.event_name == 'schedule' }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
@@ -41,5 +41,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install "pip-audit>=2.7,<3.0"
 
-      - name: Audit pinned dependencies
-        run: pip-audit -r requirements.txt --disable-pip
+      # Project mode (the trailing `.`): pip-audit resolves pyproject.toml's
+      # ranges into the tree an install would produce, and audits that. It is
+      # not installed into this job first, because pip-audit audits whatever
+      # shares its environment and would then report its own dependencies as
+      # findings here. `--disable-pip` went with the lockfile — it is only
+      # valid for hashed requirements files. `--strict` turns a failed
+      # dependency collection into a red job instead of a partial audit.
+      - name: Audit the resolved dependency tree
+        run: pip-audit --strict .
