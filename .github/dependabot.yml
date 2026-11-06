@@ -5,10 +5,23 @@ updates:
   # lockfile, and Dependabot's `pip` ecosystem reads a PEP 621 pyproject.toml
   # directly.
   #
-  # The `ignore:` block caps major bumps at the same bounds that
-  # pyproject.toml's `[project] dependencies` declare, so Dependabot won't even
-  # open PRs for capped majors; a human must raise the cap intentionally to
-  # take one (edit pyproject.toml + this file, then regenerate the lockfile).
+  # Scope note: this ecosystem sees `[project] dependencies` and nothing else.
+  # `[build-system] requires` is bumped by hand, and the CI tool versions
+  # (nbmake, pytest, ruff, codespell, nbformat, pip-audit) live in workflow
+  # `run:` blocks where nothing proposes them. Pinning those is open work.
+  #
+  # No `ignore:` block, deliberately. `[project] dependencies` in
+  # pyproject.toml pins every package with `==`, matching template-python --
+  # that is what gives Dependabot something to propose. A `>=` range with no
+  # upper bound would be satisfied by every future release, so Dependabot
+  # would have nothing to edit and would open nothing at all.
+  #
+  # Ranges with caps were the previous shape and were removed 2026-11-06. A
+  # cap blocks an update on the GUESS that it breaks; an exact pin lets
+  # Dependabot propose the bump and lets CI establish whether it does.
+  # notebook-ci.yml executes the notebooks and tests.yml runs pytest, so a
+  # major that breaks us goes red on its own evidence. The old caps only hid
+  # that signal and left pull requests stuck against bounds nobody revisited.
   - package-ecosystem: "pip"
     assignees:
       - "kernelsam"
@@ -49,33 +62,10 @@ updates:
           - "s3transfer"
     commit-message:
       prefix: "deps(python):"
-    # Major-version caps. Mirror the upper bounds in pyproject.toml's
-    # `[project] dependencies`; when bumping a cap, update both files. folium
-    # is intentionally uncapped (it has been 0.x for a decade and its eventual
-    # 1.0 is expected to be non-breaking).
-    ignore:
-      - dependency-name: "placekey"
-        versions: [">=1.0"]
-      - dependency-name: "pandas"
-        versions: [">=3.0"]
-      - dependency-name: "numpy"
-        versions: [">=3.0"]
-      - dependency-name: "shapely"
-        versions: [">=3.0"]
-      - dependency-name: "geopandas"
-        versions: [">=2.0"]
-      - dependency-name: "h3"
-        versions: [">=5.0"]
-      - dependency-name: "jupyter"
-        versions: [">=2.0"]
-      - dependency-name: "jupyterlab"
-        versions: [">=5.0"]
-      - dependency-name: "ipykernel"
-        versions: [">=7.0"]
-      - dependency-name: "awscli"
-        versions: [">=3.0"]
-      - dependency-name: "python-dotenv"
-        versions: [">=2.0"]
+    # No `ignore:` block and no version caps: `[project] dependencies` pins
+    # every package with `==`, so each bump arrives as its own pull request
+    # and the notebook run decides whether it lands. A cap here would suppress
+    # the proposal instead, which is the thing that used to hide work.
 
   # GitHub Actions workflow versions. Actions are pinned by commit SHA with
   # version tag as a trailing comment; Dependabot updates both together.

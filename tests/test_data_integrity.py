@@ -1,11 +1,17 @@
-"""Pin the committed sample shapefile against a SHA256 manifest.
+"""Pin the committed sample data against a SHA256 manifest.
 
-If one of the shapefile's sibling files is edited or corrupted, CI fails and
-the offending checksum is reported. To accept a legitimate change, regenerate
-data/checksums.sha256 via:
+Covers the census block group shapefile read by advanced_functionality and the
+two POI fixtures read by Adding_Placekey_to_your_POI_dataset_... and
+Placekey_py_Simple_Getting_Started_Bulk — all three are notebook INPUTS, so a
+silent edit to any of them changes what CI proves without changing any code. If
+one is edited or corrupted, CI fails and the offending checksum is reported. To
+accept a legitimate change, regenerate data/checksums.sha256 via:
 
-    (cd data && shasum -a 256 CA_2019_census_block_groups_sample/*) \\
-        > data/checksums.sha256
+    (cd data && shasum -a 256 CA_2019_census_block_groups_sample/* \\
+        my_places_data_missing.csv bulk_sample_places.csv) > data/checksums.sha256
+
+tests/test_notebook_data.py is the other half of this: it pins what the current
+geopandas/pandas stack PARSES out of these bytes, which a checksum cannot.
 """
 from __future__ import annotations
 

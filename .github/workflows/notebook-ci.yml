@@ -34,6 +34,10 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
 
+      # This is the only install. Each notebook's own `!pip install` is guarded
+      # by `if IN_COLAB:`, so none of them runs here and nothing can resolve a
+      # second time over the top of these versions. tests/test_notebook_pins_agree.py
+      # is what keeps those guarded lines honest — see its docstring.
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -79,16 +83,26 @@ jobs:
   # environment variable is the whole of the integration — the notebooks need
   # no changes.
   #
-  # NOT YET EXECUTABLE, and neither defect is about the API key — both notebooks
-  # read an input file that does not exist in a checkout, so they fail before
-  # any lookup. Filed as notebook defects; add them here once they are fixed:
+  # Adding_Placekey_to_your_POI_dataset_... is now executable and is included
+  # below. It was blocked on its input file, not on the API key: cell 8 builds
+  # the path `../data/my_places_data_missing.csv`, which cell 9 reads and
+  # which was not bundled. That file
+  # now exists — ten rows of public civic addresses, three of them carrying a
+  # deliberately absent field so the notebook still demonstrates what it is
+  # about. No notebook cell was changed; the path it already used now resolves.
+  # The fixture is covered by tests/test_data_integrity.py and its parsed
+  # shape is pinned by tests/test_notebook_data.py.
   #
-  #   * Placekey_py_Simple_Getting_Started_Bulk.ipynb — cell 9 is
-  #     `pd.read_csv("/content/data/<your file name>.csv")`, a literal Google
-  #     Colab placeholder path.
-  #   * Adding_Placekey_to_your_POI_dataset_using_python_and_the_Placekey_API.ipynb
-  #     — cell 8 points at `../data/my_places_data_missing.csv`, which the
-  #     notebook's own prose says is deliberately not bundled.
+  # Placekey_py_Simple_Getting_Started_Bulk.ipynb is also included now. Its
+  # cell 9 was `pd.read_csv("/content/data/<your file name>.csv")`, a literal
+  # Google Colab placeholder path; it now reads `../data/bulk_sample_places.csv`.
+  # That fixture is separate from the one above because cell 12's column_map
+  # names different source columns (index/state/country_code). Its `index`
+  # values are deliberately non-numeric strings: cell 7's merge_and_format
+  # joins `index` against a `query_id` that pandas has read back as str, and
+  # pandas raises on an int64-to-object merge.
+  #
+  # Every notebook below is now executable; nothing remains blocked on data.
   #
   # Tutorial_2 is included and exercises pandas, the placekey geometry helpers
   # and the awscli data fetch, but makes no API calls: its cell 25 sets
@@ -115,6 +129,10 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
 
+      # This is the only install. Each notebook's own `!pip install` is guarded
+      # by `if IN_COLAB:`, so none of them runs here and nothing can resolve a
+      # second time over the top of these versions. tests/test_notebook_pins_agree.py
+      # is what keeps those guarded lines honest — see its docstring.
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -127,4 +145,6 @@ jobs:
         run: |
           pytest --nbmake --nbmake-timeout=1200 \
             notebooks/Placekey_py_Simple_Getting_Started_Single.ipynb \
-            notebooks/Tutorial_2_Joining_POI_and_non_POI_datasets_with_Placekey.ipynb
+            notebooks/Tutorial_2_Joining_POI_and_non_POI_datasets_with_Placekey.ipynb \
+            notebooks/Adding_Placekey_to_your_POI_dataset_using_python_and_the_Placekey_API.ipynb \
+            notebooks/Placekey_py_Simple_Getting_Started_Bulk.ipynb

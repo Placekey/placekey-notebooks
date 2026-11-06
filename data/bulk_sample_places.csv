@@ -1,0 +1,11 @@
+index,location_name,street_address,city,state,country_code
+poi-001,San Francisco City Hall,1 Dr Carlton B Goodlett Pl,San Francisco,CA,US
+poi-002,Massachusetts State House,24 Beacon St,Boston,MA,US
+poi-003,Seattle Central Library,1000 4th Ave,Seattle,WA,US
+poi-004,Denver Union Station,1701 Wynkoop St,Denver,CO,US
+poi-005,Chicago Cultural Center,78 E Washington St,Chicago,IL,US
+poi-006,Austin Central Library,710 W Cesar Chavez St,Austin,TX,US
+poi-007,Portland Art Museum,1219 SW Park Ave,Portland,OR,US
+poi-008,New Orleans Main Library,219 Loyola Ave,New Orleans,LA,US
+poi-009,Phoenix City Hall,200 W Washington St,Phoenix,AZ,US
+poi-010,Miami-Dade Main Library,101 W Flagler St,Miami,FL,US

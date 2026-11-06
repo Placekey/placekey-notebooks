@@ -11,6 +11,12 @@
 # Pre-rendered HTML in docs/ is also generated.
 docs/*.html linguist-generated=true -diff
 
+# Committed sample CSVs are covered by the checksum manifest that
+# tests/test_data_integrity.py enforces, so
+# `* text=auto` above must not rewrite their line endings — a Windows checkout
+# would otherwise get CRLF and fail the manifest on an unmodified tree.
+data/*.csv -text
+
 # Treat binary shapefile components as binary (they are).
 *.shp binary
 *.shx binary

@@ -42,7 +42,8 @@ jobs:
           pip install "pip-audit>=2.7,<3.0"
 
       # Project mode (the trailing `.`): pip-audit resolves pyproject.toml's
-      # ranges into the tree an install would produce, and audits that. It is
+      # exact pins, and the transitive tree they imply, into what an install
+      # would produce, and audits that. It is
       # not installed into this job first, because pip-audit audits whatever
       # shares its environment and would then report its own dependencies as
       # findings here. `--disable-pip` went with the lockfile — it is only
