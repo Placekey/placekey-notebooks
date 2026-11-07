@@ -1,0 +1,25 @@
+name: Check Claude attribution
+
+on:
+  pull_request:
+    # `edited` is deliberate. The default types are opened/synchronize/reopened,
+    # so a clean PR could pass and then have the attribution added to its
+    # DESCRIPTION afterwards with no re-run -- the required check stays green.
+    types: [opened, synchronize, reopened, edited]
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  check-claude-attribution:
+    # Required. Permissions can only be reduced through a reusable-workflow
+    # chain, never elevated -- with the workflow-level {} and nothing here, the
+    # reusable's `contents: read` request cannot be satisfied and the job fails
+    # to start.
+    permissions:
+      contents: read
+    uses: senzing-factory/build-resources/.github/workflows/check-claude-attribution.yaml@v4

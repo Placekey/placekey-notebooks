@@ -1,0 +1,19 @@
+name: Add to project placekey dependabot
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  add-to-project-dependabot:
+    permissions:
+      repository-projects: write
+    secrets:
+      PROJECT_RW_TOKEN: ${{ secrets.PLACEKEY_GITHUB_PROJECT_RW_TOKEN }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+    uses: senzing-factory/build-resources/.github/workflows/add-to-project-dependabot.yaml@v4
+    with:
+      project: ${{ vars.PLACEKEY_PROJECT_PLACEKEY }}

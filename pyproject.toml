@@ -1,3 +1,101 @@
+# Dependency manifest and tool configuration.
+#
+# `[project] dependencies` below is the complete declaration of what this
+# repository needs, and `pip install .` is the whole install — here, on a
+# developer's machine, and in CI. There is deliberately NO lockfile.
+#
+# That is a decision, not an omission: a lockfile is one resolve for one
+# interpreter on one operating system, and these are tutorial notebooks meant
+# to keep working against current releases rather than a deployed artifact
+# needing a reproducible build.
+#
+# The control is the exact `==` pins below plus CI: Dependabot proposes each
+# bump as its own pull request and the notebook run decides whether it lands.
+# This covers the RUNTIME dependencies only. The tools that run CI itself --
+# nbmake, pytest, ruff, codespell, nbformat, pip-audit -- are bounded ranges
+# inside workflow `run:` blocks, where Dependabot cannot see them and where
+# they float to the newest release in range on every run. Pinning them is the
+# right end state and is not done here.
+# That only holds while the version CI tests is the version in the diff, and
+# the notebooks themselves threaten it — each one opens with its own
+# `!pip install 'placekey>=0.0.9,<1.0'` for readers on a fresh Colab runtime,
+# which would re-resolve over the top of these pins. Those lines sit behind an
+# `if IN_COLAB:` guard, so they run for a reader and never in CI, and the
+# version CI tests is the one installed from this file.
+#
+# tests/test_notebook_pins_agree.py guards the other direction: a pin that no
+# longer satisfies a notebook's own range makes pip refuse the install, and
+# IPython's `!` does not raise, so the cell would pass green having installed
+# nothing. Widening a pin past one of those ranges means widening the notebook
+# in the same pull request.
+
+[project]
+# This repository ships notebooks, not a distribution — nothing here is built,
+# published to an index or imported as a package. `name` and `version` exist
+# only because `[project]` requires them; they are not a release identity, they
+# are never bumped, and nothing consumes them.
+name = "placekey-notebooks"
+version = "0"
+description = "Dependency manifest for the Placekey tutorial notebooks (not a published package)."
+# CI runs 3.11 and 3.12, and [tool.ruff] targets py311.
+requires-python = ">=3.11"
+dependencies = [
+  "placekey==0.0.36",
+  "pandas==2.3.3",
+  "numpy==2.4.4",
+  "shapely==2.1.2",
+  "geopandas==1.1.3",
+  "folium==0.20.0",
+  "h3==4.4.2", # placekey>=0.0.36 requires h3 v4
+
+  # Notebook runtime. Bumped 2026-11-07 to clear the 23 advisories pip-audit
+  # reported against jupyterlab 4.5.6, notebook 7.5.5 and awscli 1.44.84 the
+  # day the disabled workflows were re-enabled. Each is the LOWEST release that
+  # clears every advisory against it, not the latest, so the diff stays small
+  # and easy to review; all three predate 2026-06-12, so the 21-day cooldown
+  # holds and no security exception is claimed.
+  #
+  # jupyterlab and notebook CANNOT be chosen independently: notebook 7.6.3
+  # requires jupyterlab>=4.6.4,<4.7 and notebook 7.6.4 requires >=4.6.5. 4.5.11
+  # would have cleared jupyterlab on its own branch; notebook is what rules it
+  # out, because PYSEC-2026-4112 is not fixed anywhere on the 7.5 branch and
+  # 7.6.3 is the first clean release. Move these two together or not at all.
+  #
+  # `notebook` is new to this list and is not imported anywhere — it arrives
+  # through `jupyter`, which requires it with no version. It is pinned because
+  # pip-audit --strict is a merge gate and there is no lockfile: an undeclared
+  # transitive is a version nothing records and Dependabot never proposes, so
+  # the next notebook release would re-open the advisory with no pull request.
+  "jupyter==1.1.1",
+  "jupyterlab==4.6.4",
+  "notebook==7.6.3",
+  "ipykernel==6.31.0",
+
+  # Data fetching for sample notebooks
+  "awscli==1.45.28",
+
+  # Secure local-key handling
+  "python-dotenv==1.2.2",
+]
+
+# Build-system requires are NOT read by Dependabot's pip ecosystem, so these
+# two lines are bumped by hand. 84.0.0 rather than the current 84.2.1: this
+# repository's Dependabot cooldown is 21 days and 84.2.1 was published
+# 2026-10-20, so hand-picking it now would be the one thing that policy exists
+# to prevent. `wheel` is gone from the list because setuptools has built
+# wheels natively since 70.1 and no longer needs it declared.
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+# Nothing is packaged from this repository. Stating an empty module list turns
+# setuptools' flat-layout auto-discovery off, which would otherwise refuse to
+# build at all ("multiple top-level packages discovered": data, docs, notebooks,
+# tests). This is what makes `pip install .` — the one install path — resolve
+# the dependencies above and install no code.
+[tool.setuptools]
+py-modules = []
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"

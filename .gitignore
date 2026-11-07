@@ -35,7 +35,10 @@ ipython_config.py
 .DS_Store
 Thumbs.db
 .idea/
-.vscode/
+# .vscode/ is ignored except cspell.json, which .github/workflows/spellcheck.yaml
+# requires at exactly this path (the reusable hardcodes it and takes no inputs).
+.vscode/*
+!.vscode/cspell.json
 *.swp
 *.swo
 
@@ -43,6 +46,11 @@ Thumbs.db
 data/**/output_*
 data/**/*.tmp
 *.parquet.tmp
+# Adding_Placekey_to_your_POI_dataset_... cell 29 writes its results next to
+# its input: data/my_places_data_missing_placekeys.csv. The input is committed
+# and covered by the checksum manifest; the output is a run artifact.
+data/*_placekeys.csv
+
 
 # Logs
 *.log

@@ -13093,7 +13093,7 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>If placekey is not installed on your system you can install it and other dependencies for the notebooks in this repo by running</p>
 
-<pre><code>pip install -r requirements.txt</code></pre>
+<pre><code>pip install .</code></pre>
 
 </div>
 </div>
@@ -13175,7 +13175,7 @@ The latitude and longitude for the center of &#34;@5vg-7gq-tjv&#34; is (37.77988
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Since the location portion (Where Part) of a Placekey is based on H3, there are also functions for converting back and forth between Plackeys and H3 indices. These H3 indices are always resolution 10. There is also support for working with integer representation of H3 indices as well as the string representation.</p>
+<p>Since the location portion (Where Part) of a Placekey is based on H3, there are also functions for converting back and forth between Placekeys and H3 indices. These H3 indices are always resolution 10. There is also support for working with integer representation of H3 indices as well as the string representation.</p>
 
 </div>
 </div>
@@ -13231,7 +13231,7 @@ The integer H3 index corresponding to &#34;@5vg-7gq-tjv&#34; is 6222037695922503
 <p>Often when working with Placekeys it is useful to be able to visualize the corresponding hexagon or to operate with that hexagon and other spatial geometries. To that end we've provided funtionality to convert placekeys into several formats for specifying geometric shapes:</p>
 <ol>
 <li>Hexagon boundary coordinates,</li>
-<li>WKT (Weel-Known Text) string for the hexagon boundary,</li>
+<li>WKT (Well-Known Text) string for the hexagon boundary,</li>
 <li>GeoJSON dictionary for the hexagon boundary,</li>
 <li>Shapely Polygon object for the hexagon boundary.</li>
 </ol>

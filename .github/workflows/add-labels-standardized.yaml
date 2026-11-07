@@ -1,0 +1,20 @@
+name: Add labels standardized
+
+on:
+  issues:
+    types:
+      - opened
+      - reopened
+
+permissions: {}
+
+jobs:
+  add-issue-labels:
+    permissions:
+      issues: write
+    secrets:
+      ORG_MEMBERSHIP_TOKEN: ${{ secrets.ORG_MEMBERSHIP_TOKEN }}
+      MEMBERS: ${{ secrets.PLACEKEY_MEMBERS }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+    uses: senzing-factory/build-resources/.github/workflows/add-labels-to-issue.yaml@v4

@@ -4,6 +4,12 @@ These run with no API key and catch upstream placekey-py regressions that
 nbmake would also catch — but faster, and without needing to execute a
 full notebook. The reference values are taken from basic_functionality.ipynb
 (SF City Hall = (37.779351, -122.418655)).
+
+This file is the breadth layer and its tolerances are deliberately loose.
+tests/test_placekey_geometry.py is the depth layer: it pins the exact centroid,
+the hexagon vertices and their order, the coordinate order of the WKT and
+GeoJSON forms, and the units of placekey_distance. Add a new value-pinned
+assertion there, not here.
 """
 from __future__ import annotations
 
@@ -23,7 +29,8 @@ def test_geo_to_placekey_sf_city_hall():
 
 def test_placekey_to_geo_round_trip():
     lat, lon = pk.placekey_to_geo(SF_CITY_HALL_PLACEKEY)
-    # Placekey centroid is within a hexagon of ~15m radius; allow loose tolerance.
+    # Loose on purpose — 1e-3 degrees is ~111 m against a ~155 m cell.
+    # test_placekey_geometry.py pins the exact centroid.
     assert math.isclose(lat, SF_CITY_HALL[0], abs_tol=1e-3)
     assert math.isclose(lon, SF_CITY_HALL[1], abs_tol=1e-3)
 

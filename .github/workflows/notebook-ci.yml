@@ -5,7 +5,7 @@ on:
     branches: [main]
   pull_request:
   schedule:
-    - cron: "0 16 * * 1"  # weekly Monday 16:00 UTC — catch dep drift
+    - cron: "0 16 * * 1" # weekly Monday 16:00 UTC — catch dep drift
   workflow_dispatch:
 
 permissions:
@@ -24,18 +24,24 @@ jobs:
         python-version: ["3.11", "3.12"]
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-          cache-dependency-path: requirements.txt
+          cache-dependency-path: pyproject.toml
 
+      # This is the only install. Each notebook's own `!pip install` is guarded
+      # by `if IN_COLAB:`, so none of them runs here and nothing can resolve a
+      # second time over the top of these versions. tests/test_notebook_pins_agree.py
+      # is what keeps those guarded lines honest — see its docstring.
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install .
           pip install "nbmake>=1.5,<2.0" "pytest>=8.0,<9.0"
 
       - name: Execute API-key-free notebooks with nbmake
@@ -43,3 +49,102 @@ jobs:
           pytest --nbmake --nbmake-timeout=600 \
             notebooks/basic_functionality.ipynb \
             notebooks/advanced_functionality.ipynb
+
+  # The `secrets` context is not available in a job-level `if:`, so the
+  # presence of the key is probed in a job of its own and published as an
+  # output. A fork pull request (this repo is public) and any installation
+  # that has not provisioned the key get a SKIPPED job rather than a red one.
+  check-api-key:
+    runs-on: ubuntu-latest
+    outputs:
+      has-key: ${{ steps.probe.outputs.has-key }}
+    steps:
+      - name: Probe for PLACEKEY_API_KEY
+        id: probe
+        env:
+          PLACEKEY_API_KEY: ${{ secrets.PLACEKEY_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -n "${PLACEKEY_API_KEY:-}" ]; then
+            echo "has-key=true" >> "$GITHUB_OUTPUT"
+            echo "PLACEKEY_API_KEY is available — API notebooks will execute."
+          else
+            echo "has-key=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=API notebooks skipped::PLACEKEY_API_KEY is not available to this run (fork pull request, or the secret is not set). The notebooks that need a key were not executed."
+          fi
+
+  # Separate from execute-keyfree-notebooks on purpose: a failure here is a key
+  # or quota problem, a failure there is a notebook or dependency problem, and
+  # the checks list has to tell them apart without opening a log.
+  #
+  # The variable name is PLACEKEY_API_KEY, read directly by each notebook via
+  # `os.environ.get("PLACEKEY_API_KEY")` with `getpass` as the interactive
+  # fallback; it is also what .env.example documents. Supplying it as an
+  # environment variable is the whole of the integration — the notebooks need
+  # no changes.
+  #
+  # Adding_Placekey_to_your_POI_dataset_... is now executable and is included
+  # below. It was blocked on its input file, not on the API key: cell 8 builds
+  # the path `../data/my_places_data_missing.csv`, which cell 9 reads and
+  # which was not bundled. That file
+  # now exists — ten rows of public civic addresses, three of them carrying a
+  # deliberately absent field so the notebook still demonstrates what it is
+  # about. No notebook cell was changed; the path it already used now resolves.
+  # The fixture is covered by tests/test_data_integrity.py and its parsed
+  # shape is pinned by tests/test_notebook_data.py.
+  #
+  # Placekey_py_Simple_Getting_Started_Bulk.ipynb is also included now. Its
+  # cell 9 was `pd.read_csv("/content/data/<your file name>.csv")`, a literal
+  # Google Colab placeholder path; it now reads `../data/bulk_sample_places.csv`.
+  # That fixture is separate from the one above because cell 12's column_map
+  # names different source columns (index/state/country_code). Its `index`
+  # values are deliberately non-numeric strings: cell 7's merge_and_format
+  # joins `index` against a `query_id` that pandas has read back as str, and
+  # pandas raises on an int64-to-object merge.
+  #
+  # Every notebook below is now executable; nothing remains blocked on data.
+  #
+  # Tutorial_2 is included and exercises pandas, the placekey geometry helpers
+  # and the awscli data fetch, but makes no API calls: its cell 25 sets
+  # `use_pre_placekeyed = True` and reads the cached `df_placekeys.csv` it pulls
+  # from S3. It still needs the key present, because cell 8 constructs
+  # `PlacekeyAPI(...)` unconditionally and would otherwise block on `getpass`.
+  execute-api-key-notebooks:
+    needs: check-api-key
+    if: needs.check-api-key.outputs.has-key == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      # This is the only install. Each notebook's own `!pip install` is guarded
+      # by `if IN_COLAB:`, so none of them runs here and nothing can resolve a
+      # second time over the top of these versions. tests/test_notebook_pins_agree.py
+      # is what keeps those guarded lines honest — see its docstring.
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install "nbmake>=1.5,<2.0" "pytest>=8.0,<9.0"
+
+      - name: Execute API-key notebooks with nbmake
+        env:
+          PLACEKEY_API_KEY: ${{ secrets.PLACEKEY_API_KEY }}
+        run: |
+          pytest --nbmake --nbmake-timeout=1200 \
+            notebooks/Placekey_py_Simple_Getting_Started_Single.ipynb \
+            notebooks/Tutorial_2_Joining_POI_and_non_POI_datasets_with_Placekey.ipynb \
+            notebooks/Adding_Placekey_to_your_POI_dataset_using_python_and_the_Placekey_API.ipynb \
+            notebooks/Placekey_py_Simple_Getting_Started_Bulk.ipynb
