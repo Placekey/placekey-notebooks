@@ -11,3 +11,9 @@
 ^https://dev\.placekey\.io/default/register$
 ^https://docs\.placekey\.io/Placekey_Technical_White_Paper\.pdf$
 ^https://shapely\.readthedocs\.io/en/latest/project\.html$
+
+# Google Workspace Marketplace returns HTTP 400 to every non-browser client on
+# /marketplace/app/* -- verified against a known-live third-party listing and a
+# fabricated id, which both return 400, so the status says nothing about whether
+# a listing exists. Valid in-browser; last confirmed 200 via Wayback 2026-05-15.
+^https://workspace\.google\.com/marketplace/app/

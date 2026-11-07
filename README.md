@@ -15,7 +15,7 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
 
    To change a version, edit `[project] dependencies` in `pyproject.toml`. Every **runtime** dependency is pinned with `==`, so Dependabot proposes each bump as its own pull request (see `.github/dependabot.yml`) and CI decides whether it lands — there are no version caps and no `ignore:` block to keep in step. The tools that run CI (`nbmake`, `pytest`, `ruff`, `codespell`, `nbformat`, `pip-audit`) are bounded ranges in the workflows' own `run:` blocks and are not Dependabot-managed.
 
-   Four notebooks carry their own `!pip install 'placekey>=0.0.9,<1.0'`, because a reader on a fresh Colab runtime needs it. CI constrains those lines to the installed versions so they cannot resolve past the pins, and checks afterwards that nothing moved; `tests/test_notebook_pins_agree.py` checks the other direction, that each pin still satisfies the range a notebook asks for. Widening a pin past one of those ranges means widening the notebook in the same pull request.
+   Four notebooks carry their own `!pip install 'placekey>=0.0.9,<1.0'`, because a reader on a fresh Colab runtime needs it. Each sits behind an `if IN_COLAB:` guard, so it runs for a reader and never in CI — the version CI tests is the one installed from `pyproject.toml`. `tests/test_notebook_pins_agree.py` guards the other direction, that each pin still satisfies the range a notebook asks for. Widening a pin past one of those ranges means widening the notebook in the same pull request.
 
 2. Get a Placekey API key — sign up at [placekey.io](https://placekey.io/).
 

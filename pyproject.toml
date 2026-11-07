@@ -19,12 +19,9 @@
 # That only holds while the version CI tests is the version in the diff, and
 # the notebooks themselves threaten it — each one opens with its own
 # `!pip install 'placekey>=0.0.9,<1.0'` for readers on a fresh Colab runtime,
-# which would re-resolve over the top of these pins. notebook-ci.yml exports
-# PIP_CONSTRAINT pointing at a `pip freeze` of the environment it just
-# installed, so those lines can only land on what is already there, and it
-# diffs a second freeze afterwards to prove nothing moved. The freeze covers
-# every resolved distribution, not just the twelve named here — a constraints
-# file binds only the names it contains.
+# which would re-resolve over the top of these pins. Those lines sit behind an
+# `if IN_COLAB:` guard, so they run for a reader and never in CI, and the
+# version CI tests is the one installed from this file.
 #
 # tests/test_notebook_pins_agree.py guards the other direction: a pin that no
 # longer satisfies a notebook's own range makes pip refuse the install, and
