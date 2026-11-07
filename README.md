@@ -1,5 +1,5 @@
 # placekey-notebooks
-This repository includes tutorials, such as Jupyter notebooks, Google Sheets guides and more, showcasing the features of the [Placekey](https://placekey.io), the [Placekey API](https://docs.placekey.io/), [Placekey Python library](https://github.com/Placekey/placekey-py) and an expanse of no-code tools.
+This repository includes tutorials, such as Jupyter notebooks, Google Sheets guides and more, showcasing the features of the [Placekey](https://placekey.io), the [Placekey API](https://docs.placekey.io/), [Placekey Python library](https://pypi.org/project/placekey/) and an expanse of no-code tools.
 
 For more details about Placekey, visit the [Placekey website](https://placekey.io/).
 
@@ -45,7 +45,7 @@ For more details about Placekey, visit the [Placekey website](https://placekey.i
 #### ArcGIS with [AGS_placekey](https://github.com/riccardoklinger/AGS_placekey)
 * Address Matching without a Geocoder: [[tutorial](https://www.placekey.io/tutorials/address-matching-without-a-geocoder)]
 
-##  Using the [placekey-py](https://github.com/Placekey/placekey-py) Python library
+##  Using the [placekey-py](https://pypi.org/project/placekey/) Python library
 #### Placekey API Utilities in `placekey-py`
 * Calling Single Placekey Endpoint: [[notebook](notebooks/Placekey_py_Simple_Getting_Started_Single.ipynb)], [[colab notebook](https://colab.research.google.com/drive/1Uap9so3Es2PUo1mNaTswYqKmgD41Rebh?usp=sharing)]
 * Calling Bulk Placekey Endpoint: [[notebook](notebooks/Placekey_py_Simple_Getting_Started_Bulk.ipynb)], [[colab notebook](https://colab.research.google.com/drive/1y_81Kb-j1XXTxLP4B_LJXBZp2YoFJDHr?usp=sharing)]

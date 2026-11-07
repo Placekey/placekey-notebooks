@@ -51,13 +51,31 @@ dependencies = [
   "folium==0.20.0",
   "h3==4.4.2", # placekey>=0.0.36 requires h3 v4
 
-  # Notebook runtime
+  # Notebook runtime. Bumped 2026-11-07 to clear the 23 advisories pip-audit
+  # reported against jupyterlab 4.5.6, notebook 7.5.5 and awscli 1.44.84 the
+  # day the disabled workflows were re-enabled. Each is the LOWEST release that
+  # clears every advisory against it, not the latest, so the diff stays small
+  # and easy to review; all three predate 2026-06-12, so the 21-day cooldown
+  # holds and no security exception is claimed.
+  #
+  # jupyterlab and notebook CANNOT be chosen independently: notebook 7.6.3
+  # requires jupyterlab>=4.6.4,<4.7 and notebook 7.6.4 requires >=4.6.5. 4.5.11
+  # would have cleared jupyterlab on its own branch; notebook is what rules it
+  # out, because PYSEC-2026-4112 is not fixed anywhere on the 7.5 branch and
+  # 7.6.3 is the first clean release. Move these two together or not at all.
+  #
+  # `notebook` is new to this list and is not imported anywhere — it arrives
+  # through `jupyter`, which requires it with no version. It is pinned because
+  # pip-audit --strict is a merge gate and there is no lockfile: an undeclared
+  # transitive is a version nothing records and Dependabot never proposes, so
+  # the next notebook release would re-open the advisory with no pull request.
   "jupyter==1.1.1",
-  "jupyterlab==4.5.6",
+  "jupyterlab==4.6.4",
+  "notebook==7.6.3",
   "ipykernel==6.31.0",
 
   # Data fetching for sample notebooks
-  "awscli==1.44.84",
+  "awscli==1.45.28",
 
   # Secure local-key handling
   "python-dotenv==1.2.2",

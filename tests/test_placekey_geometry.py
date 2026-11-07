@@ -53,7 +53,14 @@ SF_HEX_BOUNDARY = (
 # library. It is invariant under swapping the two axes, which is what makes it
 # usable against placekey_to_polygon() without first knowing that function's
 # coordinate order.
-SF_HEX_AREA_SQ_DEG = 1.599167262611445e-06
+#
+# CORRECTED: this read 1.599167262611445e-06, which was not the area of these
+# vertices — it was the output of _shoelace() below before that function shifted
+# its origin, wrong in the 7th significant figure through floating-point
+# cancellation (see that function). The value here is the exact area of the
+# SF_HEX_BOUNDARY doubles, computed in rationals; the fixed _shoelace()
+# reproduces it bit for bit, and shapely's Polygon.area agrees to 2.3e-11.
+SF_HEX_AREA_SQ_DEG = 1.5991663996574022e-06
 
 # A full `what@where` placekey. basic_functionality and advanced_functionality
 # both assert this form is valid; Tutorial_2 slices it (see the join test).
@@ -69,9 +76,33 @@ NEIGHBOR_B = "@5vg-7gq-t9z"
 #     floating-point slack to allow and allowing any would hide a real change.
 #   * Coordinates are compared with abs_tol=1e-9 degrees (~0.1 mm). That is far
 #     below any geometric change the library could make and far above the
-#     last-bit variation between platforms and C math library versions. It is also the
-#     floor imposed by placekey_to_wkt(), which prints ~16 significant digits.
+#     last-bit variation between platforms and C math library versions.
+#     (An earlier version of this note called 1e-9 "the floor imposed by
+#     placekey_to_wkt()". It is not: that function prints ~16 significant
+#     digits, a floor of ~1e-13 degrees. 1e-9 is the platform-variation
+#     allowance and nothing else constrains it.)
+#   * A quantity DERIVED from those coordinates cannot be asserted tighter than
+#     the coordinate tolerance allows it to move. See AREA_REL_TOL.
 COORD_ABS_TOL = 1e-9
+
+# Hexagon circumradius in degrees (~8.6e-4), measured from the pinned vertices
+# rather than stated, so it cannot drift away from them.
+_VERTEX_MEAN = (
+    sum(p[0] for p in SF_HEX_BOUNDARY) / len(SF_HEX_BOUNDARY),
+    sum(p[1] for p in SF_HEX_BOUNDARY) / len(SF_HEX_BOUNDARY),
+)
+SF_HEX_CIRCUMRADIUS_DEG = max(
+    ((p[0] - _VERTEX_MEAN[0]) ** 2 + (p[1] - _VERTEX_MEAN[1]) ** 2) ** 0.5
+    for p in SF_HEX_BOUNDARY
+)
+
+# Area tolerance, DERIVED from COORD_ABS_TOL, not chosen. Displacing all six
+# vertices radially by d scales the area by (1 + d/R)**2, so an area can move by
+# 2*d/R while every vertex still passes at abs_tol=d. With d=1e-9 and R=8.6e-4
+# that is 2.3e-06 — the floor for any area assertion in this file. Anything
+# tighter asserts more about the area than the file asserts about the vertices
+# the area is computed from, which is the defect this replaced.
+AREA_REL_TOL = 2 * COORD_ABS_TOL / SF_HEX_CIRCUMRADIUS_DEG
 
 
 def _normalize_lat_lon(pair):
@@ -86,11 +117,22 @@ def _normalize_lat_lon(pair):
 
 
 def _shoelace(points) -> float:
+    """Shoelace area, with the origin shifted to the first vertex.
+
+    The shift is not cosmetic. These coordinates are ~1.2e2 while the area is
+    ~1.6e-6, so the raw cross products are ~4.6e3 and a sum without that shift
+    loses about nine decimal digits to cancellation. On SF_HEX_BOUNDARY that
+    form returned 1.599167262611445e-06 where the exact area of the same
+    doubles is 1.5991663996574022e-06 — a 5.4e-07 relative error, and the
+    entire reason this file's area assertion disagreed with shapely. Shifting
+    first makes the products ~1e-6 and the result exact to the last bit.
+    """
+    x0, y0 = points[0]
     total = 0.0
     n = len(points)
     for i in range(n):
-        x1, y1 = points[i]
-        x2, y2 = points[(i + 1) % n]
+        x1, y1 = points[i][0] - x0, points[i][1] - y0
+        x2, y2 = points[(i + 1) % n][0] - x0, points[(i + 1) % n][1] - y0
         total += x1 * y2 - x2 * y1
     return abs(total) / 2
 
@@ -217,11 +259,17 @@ def test_polygon_area_and_vertices_match_the_hex_boundary():
     # above already pin the orders that the notebooks consume. What matters for
     # this one is that it describes the SAME hexagon, so the comparison is made
     # axis-order-agnostic: area is invariant under a swap, and the vertex set is
-    # normalized before comparison. rel_tol=1e-9 on the area is the float floor,
-    # not a geometric allowance — the area is ~1.6e-6 deg^2 and any real change
-    # to the cell moves it by several percent.
+    # normalized before comparison.
+    #
+    # AREA_REL_TOL (2.3e-06) rather than a chosen number: the area is derived
+    # from vertices this file only pins to 1e-9 degrees, so that is the tightest
+    # the area can honestly be held. It is still four orders of magnitude inside
+    # the several-percent move any real change to the cell would produce, and
+    # shapely currently lands 2.3e-11 away, leaving ~1e5 of margin. The vertex
+    # comparison below is the strict check; this one is the cheap,
+    # axis-order-agnostic probe that gets there first.
     poly = pk.placekey_to_polygon(SF_CITY_HALL_PLACEKEY)
-    assert math.isclose(poly.area, SF_HEX_AREA_SQ_DEG, rel_tol=1e-9)
+    assert math.isclose(poly.area, SF_HEX_AREA_SQ_DEG, rel_tol=AREA_REL_TOL)
     assert math.isclose(_shoelace(SF_HEX_BOUNDARY), SF_HEX_AREA_SQ_DEG, rel_tol=1e-12)
 
     got = sorted(_normalize_lat_lon(c) for c in list(poly.exterior.coords)[:-1])
