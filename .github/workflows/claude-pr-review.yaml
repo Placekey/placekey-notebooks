@@ -13,9 +13,9 @@ permissions: {}
 jobs:
   review:
     # Pinned to an exact tag, not the floating @v4, deliberately: v4 is parked
-    # on the rolled-back 4.5.1 and 4.9.1 is the release under test, which has
+    # on the rolled-back 4.5.1 and 4.9.2 is the release under test, which has
     # to be exercised on real pull requests before the major tag moves.
-    uses: senzing-factory/build-resources/.github/workflows/claude-pull-request-review.yaml@4.9.1
+    uses: senzing-factory/build-resources/.github/workflows/claude-pull-request-review.yaml@4.9.2
     permissions:
       contents: read
       pull-requests: write
